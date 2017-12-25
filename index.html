@@ -20,7 +20,10 @@
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
 
-  <button onclick="audioToggle()"> Toggle Audio </button>
+  <button class="btn btn-primary" onclick="audioToggle()"> Toggle Audio </button>
+
+  <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.css">
+  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
 
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
@@ -35,6 +38,8 @@
 
   <script>
     // Gibber.init();
+    
+
     $(function () {
       // const osc = new OSC({ plugin: new OSC.WebsocketServerPlugin() });
       // osc.open() // listening on 'ws://localhost:8080'
@@ -51,6 +56,42 @@
         console.log("receiving " + msg);
         $("#messages").append($('<li>').text(msg));
         window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      $(document).keypress(function(event) {
+        // alert('Handler for .keypress() called. - ' + event.charCode);
+        console.log(event.charCode);
+        if (event.charCode == "112") {    //p = 112
+          console.log("pressing p");
+          socket.emit("play", 1);
+          // playMusic(1);   // start playing music
+        }
+        else if (event.charCode == "115") {
+          socket.emit("play", 0);
+          console.log("pressing s");
+          // playMusic(0);   // stop playing music
+        }
+        else if (event.charCode == "114") {
+          socket.emit("releaseChange", 1);
+          console.log("pressing r");
+          // playMusic(0);   // increase release
+        }
+        else if (event.charCode == "101") {
+          socket.emit("releaseChange", -1);
+          console.log("pressing e");
+          // playMusic(0);   // reduce release
+        }
+        else if (event.charCode == "102") {
+          socket.emit("speedChange", 1);
+          console.log("pressing f");
+          // playMusic(0);   // stop playing music
+        }
+        else if (event.charCode == "100") {
+          socket.emit("speedChange", -1);
+          console.log("pressing d");
+          // playMusic(0);   // stop playing music
+        }
+
       });
 
     });
