@@ -1,7 +1,32 @@
 {
-    "name": "socket fiddle",
-    "version": "0.0.2",
-    "dependencies": {
-        "osc.js": "2.2.0"
-    }
+  "name": "fiddlysock",
+  "version": "0.0.2",
+  "dependencies": {
+    "bootstrap": "~3.3.7",
+    "osc-js": "~1.2.0",
+    "jquery": "~3.2.1"
+  },
+  "main": "index.js",
+  "homepage": "https://github.com/Visheshk/Fiddlybit",
+  "authors": [
+    "Vishesh Kumar <vishesh@visheshk.net>"
+  ],
+  "description": "fiddle with sockets",
+  "moduleType": [
+    "es6",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "sockets",
+    "games"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }

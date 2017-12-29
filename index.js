@@ -1,24 +1,38 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var OSC = require('osc-js');
 var port = process.env.PORT || 3000;
 var Worker = require('webworker-threads').Worker;
+// require('handlebars');
+
 
 // gibbs = require('./gibber.audio.lib.min.js')
 
-  const osc = new OSC({
-    plugin: new OSC.DatagramPlugin({ send: { port: 4559, host: '127.0.0.1' } })
-  });
+const osc = new OSC({
+  plugin: new OSC.DatagramPlugin({ send: { port: 4559, host: '127.0.0.1' } })
+});
 
   // const osc = new OSC( { plugin: new OSC.WebsocketServerPlugin() } );
-  osc.open() // listening on 'ws://localhost:8080'
+osc.open() // listening on 'ws://localhost:8080'
 
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 
 });
+
+// app.configure(function(){
+//     // Serve up content from public directory
+//     // app.use(express.static(__dirname + '/public'));
+//     app.use(express.static(__dirname + '/bower_components'));
+//     app.use(app.router);
+//     app.use(express.logger()); 
+// });
+
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
+
 
 var worker = new Worker(function(){
   postMessage("I'm working before postMessage('ali').");
@@ -40,6 +54,23 @@ release = 1;
 noteArr = [[1, 60], [1, 60], [1, 67], [1, 67], [1, 69], [1, 69], [1, 67], [1, 20], [1, 65], [1, 65], [1, 64], [1, 64], [1, 62], [1, 62], [2, 60]]
 
 ticklength = 500;
+vals = []
+
+
+updateVals = function () {
+  vals = [
+    {
+      "docid": "playState",
+      "val": playing
+    },
+    {
+      "docid": "speedVal",
+      "val": ticklength
+    }
+  ]
+  console.log(vals);
+  return true;
+}
 
 resumePlaying = function () {
   if (checkPlayState() == 0){
@@ -47,12 +78,15 @@ resumePlaying = function () {
     console.log(lastNotePlay);
     lastNotePlay = Date.now();
     playMusic();
+    updateVals();
   }
 }
 
 stopPlaying = function () {
   playing = 0;
   console.log("stopping play");
+  updateVals();
+
 }
 
 checkPlayState = function () {
@@ -81,6 +115,11 @@ playMusic = function () {
 io.on('connection', function(socket){
   console.log('a user connected');
   console.log(socket.id);
+
+  variableChange = function () {
+    io.emit('variable values', vals);
+  }
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
@@ -99,10 +138,19 @@ io.on('connection', function(socket){
     if (state == 1) {
       resumePlaying();
     }
-    if (state == 0) {
+    else if (state == 0) {
       console.log("stop call");
       stopPlaying();
     }
+    else if (state == -1){
+      if (playing == 0) {
+        resumePlaying();
+      }
+      else if (playing == 1) {
+        stopPlaying();
+      }
+    }
+    variableChange();
   });
 
   socket.on('releaseChange', function (dir) {
@@ -120,10 +168,17 @@ io.on('connection', function(socket){
     if (ticklength > 2000) {
       ticklength = 250;
     }
-    else if (release < 100) {
-      release = 2000;
+    
+    if (ticklength < 100) {
+      ticklength = 2000;
     }
+    updateVals();
+    variableChange();
   });
+
+  socket.on('send variable vals', function () {
+    variableChange();
+  })
 
 });
 

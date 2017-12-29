@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "my first socket.io app",
   "dependencies": {
+    "bower": "^1.8.2",
     "express": "^4.15.2",
-    "jquery": "^3.2.1",
+    "handlebars": "^4.0.11",
     "osc": "2.2.0",
     "osc-js": "^1.2.0",
     "osc-min": "^1.1.1",
