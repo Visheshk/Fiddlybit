@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var OSC = require('osc-js');
 var port = process.env.PORT || 3000;
-var Worker = require('webworker-threads').Worker;
+// var Worker = require('webworker-threads').Worker;
 // require('handlebars');
 
 
@@ -14,7 +14,6 @@ const osc = new OSC({
   plugin: new OSC.DatagramPlugin({ send: { port: 4559, host: '127.0.0.1' } })
 });
 
-  // const osc = new OSC( { plugin: new OSC.WebsocketServerPlugin() } );
 osc.open() // listening on 'ws://localhost:8080'
 
 
@@ -23,39 +22,179 @@ app.get('/', function(req, res){
 
 });
 
-// app.configure(function(){
-//     // Serve up content from public directory
-//     // app.use(express.static(__dirname + '/public'));
-//     app.use(express.static(__dirname + '/bower_components'));
-//     app.use(app.router);
-//     app.use(express.logger()); 
-// });
 
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
-
-
-var worker = new Worker(function(){
-  postMessage("I'm working before postMessage('ali').");
-  this.onmessage = function(event) {
-    postMessage('Hi ' + event.data);
-    self.close();
-  };
-});
-worker.onmessage = function(event) {
-  console.log("Worker said : " + event.data);
-};
-worker.postMessage('ali');
 
 
 playing = 0;
 lastNotePlay = Date.now();
 notePlaying = 0;
 release = 1;
-noteArr = [[1, 60], [1, 60], [1, 67], [1, 67], [1, 69], [1, 69], [1, 67], [1, 20], [1, 65], [1, 65], [1, 64], [1, 64], [1, 62], [1, 62], [2, 60]]
+
+
+messageList = [
+  "/play_this",   //0 is note play
+                        //check for each parameter of note play if it's a string or not
+  "/sleep",       //1 is sleep
+                        //check parameter if it's a variable
+  "/sample",      //2 is sample
+                        //0 is perc_snap, 1 is bd_fat
+  "/synthplay"    //3 is synth
+                        //0 is beep, 1 is d_saw
+]
+
+
+playArr = [
+  [3, 0], 
+  [0, 64, 0.8, 0.4], 
+  [3, 1], 
+  [0, 40, 2, 0.1], 
+  [2, 1], 
+  [1, 0.6], 
+  [3, 0], 
+  [0, 62, 0.8, 0.4], 
+  [1, 0.6], 
+  [3, 0],                                       //use_synth :beep
+  [0, "a", 0.8, 0.4],                           //play a, release: 0.8, amp: 0.4
+  [2, 0],                                       //sample :perc_snap2
+  [1, "e"],                                     //sleep e
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [2, 0.6],
+  //measure 2
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [3, 1],
+  [0, 36, 2, 0.1],
+  [2, 1],
+  [1, 0.6],
+  
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [2, 1],
+  [1, "e"],
+
+  [3, 0],
+  [0, "b", 0.8, 0.4],
+  [2, 0],
+  [1, "f"],
+  //measure 3
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [3, 1],
+  [0, 38, 2, 0.1],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [2, 1],
+  [1, "e"],
+
+  [3, 0],
+  [0, "c", 0.8, 0.4],
+  [2, 0],
+  [1, 1.2],
+  //measure 4
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [3, 1],
+  [0, 43, 2, 0.1],
+  [2, 1],
+  [1, "e"],
+
+  [3, 0],
+  [0, 67, 0.8, 0.4],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, "d", 0.8, 0.4],
+  [2, 1],
+  [1, "f"],
+  //measure 5
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [3, 1],
+  [0, 40, 2, 0.1],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [2, 0.6],
+
+  [3, 0],
+  [0, "a", 0.8, 0.4],
+  [2, 1],
+  [1, "e"],
+
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [1, "e"],
+  //measure 6
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [3, 1],
+  [0, 36, 2, 0.1],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, "b", 0.8, 0.4],
+  [2, 0],
+  [1, 1.2],
+
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [2, 1],
+  [1, 0.6],
+  //measure 7
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [3, 1],
+  [0, 38, 2, 0.1],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, 64, 0.8, 0.4],
+  [2, 1],
+  [1, 0.6],
+
+  [3, 0],
+  [0, 62, 0.8, 0.4],
+  [1, 0.6],
+  //measure 8
+  [3, 0],
+  [0, "a", 0.8, 0.4],
+  [3, 1],
+  [0, 36, 2, 0.1],
+  [1, 0.6],
+
+  [2, 0],
+  [1, 0.6],
+
+  [2, 1],
+  [1, "f"],
+]
+// noteArr = [[1, 60], [1, 60], [1, 67], [1, 67], [1, 69], [1, 69], [1, 67], [1, 20], [1, 65], [1, 65], [1, 64], [1, 64], [1, 62], [1, 62], [2, 60]]
+variables = {
+  "a": 55,
+  "b": 71,
+  "c": 90,
+  "d": 43,
+  "e": 1,
+  "f": 0.2
+}
 
 ticklength = 500;
 vals = []
-
 
 updateVals = function () {
   vals = [
@@ -75,7 +214,7 @@ updateVals = function () {
 resumePlaying = function () {
   if (checkPlayState() == 0){
     playing = 1;
-    console.log(lastNotePlay);
+    // console.log(lastNotePlay);
     lastNotePlay = Date.now();
     playMusic();
     updateVals();
@@ -93,19 +232,80 @@ checkPlayState = function () {
   return(playing);
 }
 
+note = 0
+varval = 0
+rel = 0
+amp = 0
+parameters = []
+
+getValue = function (note) {
+  if (isNaN(parseInt(note))) {
+    return variables[note];
+  }
+  else {
+    return note;
+  }
+}
+
 playMusic = function () {
   playing = checkPlayState();
+  message = "";
   if (playing == 1) {
     nowtime = Date.now();
-    console.log("playing + " + Date.now());
-    const message = new OSC.Message('/play_this', parseInt(noteArr[notePlaying][1]), parseInt(noteArr[notePlaying][0]));
-    osc.send(message);
-    notePlaying = (notePlaying + 1) % noteArr.length;
+    // console.log("playing + " + Date.now());
+    //TODO: Figure out nice way to split messages dep3ending on different commands
+    note = 0;
+    varval = 0;
+    rel = 0;
+    amp = 0;   
+    parameters = [];
+    console.log("instruction = " + playArr[notePlaying].toString());
+    if (playArr[notePlaying][0] == 0) {
+      note = getValue(playArr[notePlaying][1])
+      rel = getValue(playArr[notePlaying][2])
+      amp = getValue(playArr[notePlaying][3])
+      parameters = [note, rel, amp]
+      console.log(parameters[0] + " " + parameters[1] + " " + parameters[2]);
+      console.log("play parameter = " + parameters);
+      message = new OSC.Message(messageList[playArr[notePlaying][0]], note, rel, amp);
+    } 
+    else if (playArr[notePlaying][0] == 1 || playArr[notePlaying][0] == 2 || playArr[notePlaying][0] == 3) {
+      parameters = [getValue(playArr[notePlaying][1])];
+      // parameters = [parameters];
+      console.log("parameter non play = " + parameters);
+      message = new OSC.Message(messageList[playArr[notePlaying][0]], getValue(playArr[notePlaying][1]));
+
+    }
+    // else if (playArr[notePlaying][0] == 1) {
+    //   parameters = [getValue(playArr[notePlaying][1])]
+    // }
+    // else if (playArr[notePlaying][0] == 1) {
+    //   parameters = [getValue(playArr[notePlaying][1])]
+    // }
+    // const message = new OSC.Message(messageList[playArr[notePlaying][0]], parseInt(noteArr[notePlaying][1]), parseInt(noteArr[notePlaying][0]));
+    if(playArr[notePlaying][0] == 1) {
+      console.log("going to sleep");
+      setTimeout(playMusic, parameters[0]);
+    }
+    else{
+      // console.log(messageList[playArr[notePlaying][0]] + parameters.toString())
+      // console.log("making message " + messageList[playArr[notePlaying][0]] + " " + parameters.toString() + " of type " + typeof(parameters));
+      // const message = new OSC.Message(messageList[playArr[notePlaying][0]], parameters);
+      // const message = new OSC.Message("play_this/", parameters);
+      if (message != ""){
+        osc.send(message);
+      }
+      setTimeout(playMusic, 200);
+    }
+    // osc.send(message);
+    // notePlaying = (notePlaying + 1) % noteArr.length;
+    notePlaying = (notePlaying + 1) % playArr.length;
+    // setTimeout(playMusic, 500);
     // if (nowtime - lastNotePlay > 800) {
     //   lastNotePlay = nowtime;-
     //   console.log("playing");
     // }
-    setTimeout(playMusic, ticklength);
+    
   }
   
     // playMusic();
@@ -144,9 +344,11 @@ io.on('connection', function(socket){
     }
     else if (state == -1){
       if (playing == 0) {
+        console.log("resuming play from client call");
         resumePlaying();
       }
       else if (playing == 1) {
+        console.log("stopping play from client call");
         stopPlaying();
       }
     }

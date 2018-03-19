@@ -1,3 +1,4 @@
 node_modules
 gibber.audio.lib.min.js
 bower_components
+.DS_Store
