@@ -4,7 +4,7 @@
     <title>Fiddlybits</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
+      body { font: 13px Helvetica, Arial; margin: 35px; padding: 55px;}
       form { background: #000; padding: 3px; bottom: 0; width: 500; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
@@ -12,6 +12,11 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
       #messages { margin-bottom: 40px }
+
+      /*#slider .ui-slider-handle {background: #11e;top: .4em;}*/
+      /*#ex1Slider .slider-selection {
+        background: #BABABA;
+      }*/
     </style>
   </head>
   <body>
@@ -23,11 +28,16 @@
   
   <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
   <link href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+  <link href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
+  <!-- <link href="/bower_components/bootstrap-slider/slider.css" rel="stylesheet"> -->
+  
   <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
 
   <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
-
-
+  <script type="text/javascript" src="/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
+  <script type="text/javascript" src="/bower_components/jQuery-Kontrol/js/jquery.kontrol.js"></script>
+  <!-- <script type="text/javascript" src="/bower_components/bootstrap-slider/bootstrap-slider.js"></script> -->
 
   <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
   <script src="/socket.io/socket.io.js"></script>
@@ -85,9 +95,9 @@
 
       });
 
-      speedChange = function (dir) {
-        socket.emit("speedChange", parseInt(dir));
-      }
+      // speedChange = function (dir) {
+      //   socket.emit("speedChange", parseInt(dir));
+      // }
       
 
       $(document).keypress(function(event) {
@@ -132,17 +142,157 @@
 
 
   </script>
+  <div class= "row">
+    <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px">
+      <button class="btn btn-primary" onclick="audioToggle()"> Toggle Audio </button>
+      <button type="button" class="btn" id = "playState">Play State</button>
+    </div>
 
-  <div class="btn-group-vertical" role="group" aria-label="speed-direction">
-    <button class="btn btn-primary" onclick="audioToggle()"> Toggle Audio </button>
-    <button type="button" class="btn" id = "playState">Play State</button>
-  </div>
 
-  <div class="btn-group-vertical" role="group" aria-label="speed-direction">
+  <!-- <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px">
     <button type="button" class="btn btn-default" onclick="speedChange(1)">Longer Beats</button>
     <button type="button" class="btn" id = "speedVal">Beat Length here</button>
     <button type="button" class="btn btn-default" onclick="speedChange(-1)">Quicker Beat</button>
+  </div> -->
+  <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px">
+    <button class="btn btn-primary" onclick="resetGame()"> Reset Game </button>
+    <button class="btn" id = "playerNo" onclick="changePlayer()">Player: </p>
   </div>
+  </div>
+
+  <div class="row" id="set1">
+    <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px;float:left;">
+      <input type="text" value="75" class="dial" id="dial1">
+    </div>
+
+<!--   <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px">
+    <input type="text" value="75" class="xy-pad">
+  </div>
+ -->
+  <!-- <div id="slider" style="width:260px;"></div> -->
+
+  <!-- <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/> -->
+  <!-- <div class="btn-group-horizontal" role="group" aria-label="speed-direction" style="padding:35px"> -->
+    <div style="width:200px;padding:30px;float:left;">
+      <div style="margin-bottom:10px"></div>
+      <fieldset class="pad" data-width="180" data-height="180" id="pad1">
+          <legend>XY Pad</legend>
+          x : <input name="x" value=27 id="x1">
+          y : <input name="y" value=80 id="y1">
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="row" id="set2">
+    <div style="width:300px;padding:30px;float:left;">
+      <div style="margin-bottom:10px">Bars </div>
+      <fieldset class="bars" data-width="100" data-cols="1" data-min="-100" data-max="100" id="br2">
+        <input value=90 id="bars2">
+      </fieldset>
+    </div>
+
+    <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px;float:left;">
+      <input type="text" value="75" class="dial" id="dial2">
+    </div>
+
+  </div>
+  
+<!--   <div class="row">
+    <div style="width:300px;padding:30px;float:left;">
+      <div style="margin-bottom:10px">Bars </div>
+      <fieldset class="bars1" data-width="100" data-cols="1" data-min="-100" data-max="100">
+        <input value=90>
+      </fieldset>
+    </div>
+
+    <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px;float:left;">
+      <input type="text" value="75" class="dial">
+    </div>
+
+  </div> -->
+  
+  <div class="row" id="set3">
+    <div style="width:200px;padding:30px;float:left;">
+      <div style="margin-bottom:10px"></div>
+      <fieldset class="pad" data-width="180" data-height="180" id="pad3">
+          <legend>XY Pad</legend>
+          x : <input name="x" value=27 id="x3">
+          y : <input name="y" value=80 id="y3">
+      </fieldset>
+    </div>
+
+    <div style="width:300px;padding:30px;margin-left:80px;float:left;">
+      <div style="margin-bottom:10px">Bars </div>
+      <fieldset class="bars" data-width="100" data-cols="1" data-min="-100" data-max="100" id="br3">
+        <input value=90 id="bars3">
+      </fieldset>
+    </div>
+
+  </div>
+  
+
+
+  <script>
+      $(function() {
+        $(".dial").knob({
+            'change' : function (v) { console.log(v); }
+        });
+        // $(".dial").knob(
+        //   'change':function(e){
+        //     console.log(e);
+        // });
+      });
+
+      var pad = $(".pad")
+        .xy({
+                displayPrevious:false
+                , min : -100
+                , max : 100
+                , fgColor:"#222222"
+                , bgColor:"#EEEEEE"
+                , change : function (value) {
+                    console.log(value[0], " ", (this).$[0].id);
+                    socket.emit("clientVarChange", [value[0], (this).$[0].id]);
+                }
+            })
+        .css({'border':'5px solid #BBB'});
+
+        // $pad.onChange({
+
+        // })
+        
+      
+      $(".bars").bars({
+          fgColor:"#222222",
+          bgColor:"#EEEEEE",
+          'change' : function (v) { 
+            console.log(v[0], (this).$[0].id); 
+            socket.emit("clientVarChange", [v[0], (this).$[0].id]);
+          }
+          /*, change : function (value) {
+              console.log("change : ", value);
+          }*/
+          /*, draw : function () {
+              console.log(this.o);
+          }*/
+      });
+
+      //dial1; x1 and y1
+      //bars2; dial2
+      //x3 and y3; bars3
+      $(".dial").dial({
+        'change':function(e){
+          console.log(e, (this).$[0].id);
+          socket.emit("clientVarChange", [e, (this).$[0].id]);
+        }
+      });
+
+      // $("#dial1").on("change", function () {
+      //   console.log($(this).val(), (this).$[0].id);
+      //   socket.emit("clientVarChange", [v[0], (this).$[0].id]);
+      // })
+
+  </script>
 
 
 

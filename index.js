@@ -184,6 +184,16 @@ playArr = [
   [1, "f"],
 ]
 // noteArr = [[1, 60], [1, 60], [1, 67], [1, 67], [1, 69], [1, 69], [1, 67], [1, 20], [1, 65], [1, 65], [1, 64], [1, 64], [1, 62], [1, 62], [2, 60]]
+varAnswers = {
+  "a": 55,
+  "b": 71,
+  "c": 90,
+  "d": 43,
+  "e": 1,
+  "f": 0.2
+}
+
+
 variables = {
   "a": 55,
   "b": 71,
@@ -363,6 +373,66 @@ io.on('connection', function(socket){
     else if (release > 10) {
       release = 1;
     }
+  });
+
+  checkCorrects = function () {
+    corrects = [0, 0, 0, 0, 0, 0];
+    i = 0;
+    for (k in variables) {
+      if (variables[k] == varAnswers[i]) {
+        corrects[i] = 1;
+      }
+      i++;
+    }
+  }
+
+  varNameConnects = {
+    "dial1": "a",
+    "pad1": "b",
+    "br2": "c",
+    "dial2": "d",
+    "pad3": "e",
+    "br3": "f"
+  }
+
+  varNameConversion = {
+    "dial1": [0, 100, 35, 75],
+    "pad1": [-100, 100, 50, 90],
+    "br2": [0, 100, 75, 105],
+    "dial2": [0, 100, 30, 60],
+    "pad3": [-100, 100, 0, 3],
+    "br3": [-100, 100, 0, 3]
+  }
+
+  scaleVal = function(cons, v) {   //original 1, original 2 to final 1, final 2, value to convert
+    // v = cons[4];
+    o1 = cons[0];
+    o2 = cons[1];
+    f1 = cons[2];
+    f2 = cons[3];
+    // console.log(cons);
+    if ((o2 - o1) == 0) {
+      return f2;
+    }
+    else {
+      return f1 + ( ((f2 - f1)*(v - o1)) / (o2 - o1) );
+    }
+  },
+
+  socket.on('clientVarChange', function (vs) {
+    //br3: scale -100,100 to 0, 3
+    //pad3: scale -100,100 to 0, 3
+    //dial2: scale 0,100 to 30, 60
+    //br2: scale 0, 100 to 75, 105
+    //pad1: scale -100, 100 to 50, 90
+    //dial1: scale 0, 100 to 35, 75
+
+    // newArr = (varNameConversion[vs[1]]).push(vs[0]);
+    // console.log(newArr);
+    convertedVal = scaleVal(varNameConversion[vs[1]], vs[0]);
+    variables[varNameConnects[vs[1]]] = convertedVal;
+    // console.log(variables);
+    checkCorrects();
   });
 
   socket.on('speedChange', function (dir) {

@@ -4,7 +4,12 @@
   "dependencies": {
     "bootstrap": "~3.3.7",
     "osc-js": "~1.2.0",
-    "jquery": "~3.2.1"
+    "jquery": "~3.2.1",
+    "bootstrap-slider": "*",
+    "jquery-ui": "~1.12.1",
+    "jquery-knob": "~1.2.13",
+    "jqueryui-touch-punch": "*",
+    "jQuery-Kontrol": "https://github.com/aterrien/jQuery-Kontrol.git"
   },
   "main": "index.js",
   "homepage": "https://github.com/Visheshk/Fiddlybit",
