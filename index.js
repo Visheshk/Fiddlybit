@@ -202,6 +202,9 @@ variables = {
   "e": 1,
   "f": 0.2
 }
+corrects = [0, 0, 0, 0, 0, 0]
+correctVals = [0, 0, 0, 0, 0, 0]
+lastCorrects = [0, 0, 0, 0, 0, 0]
 
 ticklength = 500;
 vals = []
@@ -375,15 +378,48 @@ io.on('connection', function(socket){
     }
   });
 
+  vnc = [
+    [0, 100, 35, 75],
+    [-100, 100, 50, 90],
+    [0, 100, 75, 105],
+    [0, 100, 30, 60],
+    [-100, 100, 0, 3],
+    [-100, 100, 0, 3]
+  ];
+  correctColors = ["", "", "", "", "", ""];
+
   checkCorrects = function () {
-    corrects = [0, 0, 0, 0, 0, 0];
+    // for (i in corrects) {
+    //   lastCorrects[i] = corrects[i];
+    // }
+
+    // lastCorrects = corrects;
+    // corrects = [0, 0, 0, 0, 0, 0];
     i = 0;
     for (k in variables) {
-      if (variables[k] == varAnswers[i]) {
-        corrects[i] = 1;
-      }
+      // if (variables[k] == varAnswers[i]) {
+      //   corrects[i] = 1;
+      // }
+      correctVals[i] = 255 * (Math.abs(variables[k] - varAnswers[k]) * 1.75)/ (vnc[i][3] - vnc[i][2]);
+
+      // correctColors[i] = correctVals[i]
+      
       i++;
     }
+    console.log(correctVals)
+    io.emit("correctUpdate", correctVals);
+    // newCor = true
+    
+    // for (i in corrects) {
+    //   if (corrects[i] != lastCorrects[i]) {
+    //     newCor = false;
+    //   }
+    // }
+
+    // if (newCor == false) {
+    //   io.emit("correctUpdate", corrects);
+    // }
+
   }
 
   varNameConnects = {
