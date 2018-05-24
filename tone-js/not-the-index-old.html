@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="Tone.js"></script>
+	<script type="text/javascript">
+
+		var synth = new Tone.Synth().toMaster();
+
+		//play a middle 'C' for the duration of an 8th note
+		playC = function () {
+			synth.triggerAttackRelease("C4", "8n");
+		}
+	</script>
+</head>
+<body>
+	<button onclick="playC()">Play C</button>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="Tone.js"></script>
+	<script type="text/javascript">
+
+		var bass = new Tone.MonoSynth({
+			"volume" : -10,
+			"envelope" : {
+				"attack" : 0.1,
+				"decay" : 0.3,
+				"release" : 2,
+			},
+			"filterEnvelope" : {
+				"attack" : 0.001,
+				"decay" : 0.01,
+				"sustain" : 0.5,
+				"baseFrequency" : 200,
+				"octaves" : 2.6
+			}
+		}).toMaster();
+
+		var kick = new Tone.MembraneSynth({
+			"envelope" : {
+				"sustain" : 0,
+				"attack" : 0.02,
+				"decay" : 0.8
+			},
+			"octaves" : 10
+		}).toMaster();
+
+		var piano = new Tone.PolySynth(4, Tone.Synth, {
+			"volume" : -8,
+			"oscillator" : {
+				"partials" : [1, 2, 1],
+			},
+			"portamento" : 0.05
+		}).toMaster()
+		
+
+		var x = 2
+		var y = 19
+		var p = -0.23
+		var q = .75
+
+		/*
+		var bassPart = new Tone.Part(function(time, event){{
+				bass.triggerAttackRelease(event.note, event.dur, time);
+			}
+		}, [{time : 0, note : 220, dur : "8n."}, 
+			{time : .75, note : 195.998, dur : "8n"}, 
+			{time : 1.5, note : 174.614, dur : "8n"}, 
+			{time : 2.25, note : 195.998, dur : "8n"},
+			{time : 3+p, note : 220*x/12, dur : "8n."}, 
+			{time : 3.75+q, note : 220*y/10, dur : "8n"}, 
+			{time : 4.5+p, note : 220, dur : "8n"}, 
+			{time : 6+p, note : 195.998*x/12, dur : "8n"},
+			{time : 6.75, note : 195.998*y/10, dur : "8n."}, 
+			{time : 7.5+q, note : 195.998, dur : "8n"}, 
+			{time : 9+p, note : 220*x/12, dur : "8n"}, 
+			{time : 9.75, note : 261.626*x/12, dur : "8n"},
+			{time : 10.5+p, note : 261.626*y/10, dur : "8n."}, 
+			{time : 12+q, note : 220*y/10, dur : "8n."}, 
+			{time : 12.75+p, note : 195.998*x/12, dur : "8n"}, 
+			{time : 13.5+p, note : 174.614*y/10, dur : "8n"}, 
+			{time : 14.25+q, note : 195.998, dur : "8n"}, 
+			{time : 15+q, note : 220*y/10, dur : "8n."}, 
+			{time : 15.75, note : 220*x/12, dur : "8n"}, 
+			{time : 16.5+p, note : 220*x/12, dur : "8n"},
+			{time : 17.25+p, note : 220*y/10, dur : "8n"},
+			{time : 18+q, note : 195.998*x/12, dur : "8n"},
+			{time : 18.75+q, note : 195.998, dur : "8n"},
+			{time : 19.5+p, note : 220*x/12, dur : "8n"},
+			{time : 20.25+p, note : 195.998*x/12, dur : "8n"},
+			{time : 21, note : 174.614*y/10, dur : "8n"}]).start(0);
+		bassPart.loop = true;
+		bassPart.loopEnd = 24;
+
+
+		var kickPart = new Tone.Part(function(time, event){{
+				kick.triggerAttackRelease(event.note, event.dur, time);
+			}
+		}, [{time : 0, note : "C2", dur : "8n."},
+			{time : 1.5, note : "C2", dur : "8n."},
+			{time : 3, note : "C2", dur : "8n."},
+			{time : 4.5+p, note : "C2", dur : "8n."},
+			{time : 6+q, note : "C2", dur : "8n."},
+			{time : 7.5+p, note : "C2", dur : "8n."},
+			{time : 9+p, note : "C2", dur : "8n."},
+			{time : 10.5+q, note : "C2", dur : "8n."},
+			{time : 12+p, note : "C2", dur : "8n."},
+			{time : 13.5+p, note : "C2", dur : "8n."},
+			{time : 15, note : "C2", dur : "8n."},
+			{time : 16.5+p, note : "C2", dur : "8n."},
+			{time : 18+q, note : "C2", dur : "8n."},
+			{time : 19.5+p, note : "C2", dur : "8n."},
+			{time : 21+q, note : "C2", dur : "8n."},
+			{time : 22.5+p, note : "C2", dur : "8n."}]).start(0);
+		kickPart.loop = true;
+		kickPart.loopEnd = 24;
+
+		var Chord1 = [349.228, 391.995, 440];
+		var Chord2 = [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		var Chord3 = [349.228*y/10, 391.995*x/12, 440*y/10];
+		var pianoPart = new Tone.Part(function(time, chord){
+			piano.triggerAttackRelease(chord, "4n", time);
+		}, [[0, Chord1], 
+			[6+q, Chord2], 
+			[9+q, Chord3], 
+			[12+p, Chord3], 
+			[18+q, Chord2], 
+			[21+p, Chord3]]).start(0);
+		pianoPart.loop = true;
+		pianoPart.loopEnd = 24;
+		*/
+
+		var keys = new Tone.Players({
+			"A" : "./Tone.js-master/examples/audio/casio/A1.[mp3|ogg]",
+			"C#" : "./Tone.js-master/examples/audio/casio/Cs2.[mp3|ogg]",
+			"E" : "./Tone.js-master/examples/audio/casio/E2.[mp3|ogg]",
+			"F#" : "./Tone.js-master/examples/audio/casio/Fs2.[mp3|ogg]",
+		}, {
+			"volume" : -10,
+			"fadeOut" : "64n",
+		}).toMaster();
+
+		//the notes
+		var noteNames = ["F#", "E", "C#", "A"];
+
+		var loop = new Tone.Sequence(function(time, col){
+			// var column = matrix1.matrix[col];
+			for (var i = 0; i < 4; i++){
+				var vel = Math.random() * 0.5 + 0.5;
+				if (i % 4 == x){
+					//slightly randomized velocities
+					keys.get(noteNames[2]).start(time, 0, "32n", 0, vel);
+				}
+				else if (i%4 == (x + 1)) {
+					keys.get(noteNames[x]).start(time, 0, "32n", 0, vel);
+				}
+			}
+		}, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "16n");
+
+		Tone.Transport.start();
+
+
+		addX = function () {
+			x = (x + 1) % 4;
+			console.log(x);
+		}
+		addY = function () {
+			y = (y + 1) % 40;
+		}
+		addP = function () {
+			p = (p + 0.1) % 2;
+		}
+		addQ = function () {
+			q = (q + 0.1) % 2;
+		}
+
+		playC = function () {
+			// Tone.Transport.start("+0.1");
+			// Tone.Transport.start();
+			loop.start();
+		}
+		playD = function () {
+			// Tone.Transport.stop();
+			loop.stop();
+		}
+	</script>
+</head>
+<body>
+	<button onclick="playC()">Start Loop</button>
+	<button onclick="addX()">Add to x</button>
+	<button onclick="addY()">Add to y</button>
+	<button onclick="addP()">Add to p</button>
+	<button onclick="addQ()">Add to q</button>
+	<button onclick="playD()">Stop Loop</button>
+</body>
+</html>

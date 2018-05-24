@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="Tone.js"></script>
+	<script type="text/javascript">
+
+		var bass = new Tone.MonoSynth({
+			"volume" : -10,
+			"envelope" : {
+				"attack" : 0.1,
+				"decay" : 0.3,
+				"release" : 2,
+			},
+			"filterEnvelope" : {
+				"attack" : 0.001,
+				"decay" : 0.01,
+				"sustain" : 0.5,
+				"baseFrequency" : 200,
+				"octaves" : 2.6
+			}
+		}).toMaster();
+
+		var x = 12
+		var y = 10
+		var p = 0
+		var q = 0
+
+		var bassPart = new Tone.Part(function(time, event){
+			if (Math.random() < event.prob){
+				bass.triggerAttackRelease(event.note, event.dur, time);
+			}
+		}, [{time : 0, note : 220, dur : "8n.", prob: 1}, 
+			{time : .75, note : 195.998, dur : "8n", prob : 1}, 
+			{time : 1.5, note : 174.614, dur : "8n", prob : 1}, 
+			{time : 2.25, note : 195.998, dur : "8n", prob : 1},
+			{time : 3+p, note : 220*x/12, dur : "8n.", prob : 1}, 
+			{time : 3.75+q, note : 220*y/10, dur : "8n", prob : 1}, 
+			{time : 4.5+p, note : 220, dur : "8n", prob : 1}, 
+			{time : 6+p, note : 195.998*x/12, dur : "8n", prob : 1},
+			{time : 6.75, note : 195.998*y/10, dur : "8n.", prob : 1}, 
+			{time : 7.5+q, note : 195.998, dur : "8n", prob : 1}, 
+			{time : 9+p, note : 220*x/12, dur : "8n", prob : 1}, 
+			{time : 9.75, note : 261.626*x/12, dur : "8n", prob : 1},
+			{time : 10.5+p, note : 261.626*y/10, dur : "8n.", prob : 1}, 
+			{time : 12+q, note : 220*y/10, dur : "8n.", prob: 1}, 
+			{time : 12.75+p, note : 195.998*x/12, dur : "8n", prob : 1}, 
+			{time : 13.5+p, note : 174.614*y/10, dur : "8n", prob : 1}, 
+			{time : 14.25+q, note : 195.998, dur : "8n", prob : 1}, 
+			{time : 15+q, note : 220*y/10, dur : "8n.", prob : 1}, 
+			{time : 15.75, note : 220*x/12, dur : "8n", prob : 1}, 
+			{time : 16.5+p, note : 220*x/12, dur : "8n", prob : 1},
+			{time : 17.25+p, note : 220*y/10, dur : "8n", prob : 1},
+			{time : 18+q, note : 195.998*x/12, dur : "8n", prob : 1},
+			{time : 18.75+q, note : 195.998, dur : "8n", prob : 1},
+			{time : 19.5+p, note : 220*x/12, dur : "8n", prob : 1},
+			{time : 20.25+p, note : 195.998*x/12, dur : "8n", prob : 1},
+			{time : 21, note : 174.614*y/10, dur : "8n", prob : 1}]).start(0);
+		bassPart.loop = true;
+		bassPart.loopEnd = 24;
+
+		playC = function () {
+			Tone.Transport.start("+0.1");}
+		playD = function () {
+			Tone.Transport.stop();}
+	</script>
+</head>
+<body>
+	<button onclick="playC()">Start Loop</button>
+	<button onclick="playD()">Stop Loop</button>
+</body>
+</html>
