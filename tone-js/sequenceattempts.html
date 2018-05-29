@@ -125,22 +125,62 @@
 			"fadeOut" : "64n",
 		}).toMaster();
 
+		var piano = new Tone.PolySynth(4, Tone.Synth, {
+			"volume" : -8,
+			"oscillator" : {
+				"partials" : [1, 2, 1],
+			},
+			"portamento" : 0.05
+		}).toMaster()
+
+		var x = 12
+		var y = 10
+		var p = 0
+		var q = 0
+		
+		// var Chord1 = [349.228, 391.995, 440];
+		Chord1 = function (x, y) {
+			return [349.228, 391.995, 440];
+		}
+		// var Chord2 = [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		Chord2 = function (x, y) {
+			return [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		}
+		// var Chord3 = [349.228*y/10, 391.995*x/12, 440*y/10];
+		Chord3 = function (x, y) {
+			return [349.228*y/10, 391.995*x/12, 440*y/10];
+		}
+		// var pianoPart = new Tone.Part(function(time, chord){
+		// 	piano.triggerAttackRelease(chord, "4n", time);
+		// }, [[0, Chord1], 
+		// 	[6+q, Chord2], 
+		// 	[9+q, Chord3], 
+		// 	[12+p, Chord3], 
+		// 	[18+q, Chord2], 
+		// 	[21+p, Chord3]]).start(0);
+		// pianoPart.loop = true;
+		// pianoPart.loopEnd = 24;
+
 		//the notes
-		var noteNames = ["F#", "E", "C#", "A"];
+		// var noteNames = ["F#", "E", "C#", "A"];
+
+		var chordList = [Chord1, Chord2, Chord3, Chord3, Chord2, Chord3];
 
 		var loop = new Tone.Sequence(function(time, col){
 			// var column = matrix1.matrix[col];
-			for (var i = 0; i < 4; i++){
-				var vel = Math.random() * 0.5 + 0.5;
-				if (i % 4 == x){
-					//slightly randomized velocities
-					keys.get(noteNames[2]).start(time, 0, "32n", 0, vel);
-				}
-				else if (i%4 == (x + 1)) {
-					keys.get(noteNames[x]).start(time, 0, "32n", 0, vel);
-				}
+			for (var i = 0; i < 6; i++){
+				// var vel = Math.random() * 0.5 + 0.5;
+				// if (i % 4 == x){
+				// 	//slightly randomized velocities
+				// 	keys.get(noteNames[2]).start(time, 0, "32n", 0, vel);
+				// }
+				// else if (i%4 == (x + 1)) {
+				// 	keys.get(noteNames[x]).start(time, 0, "32n", 0, vel);
+				// }
+				console.log( i + " " + time);
+				piano.triggerAttackRelease(chordList[i](x, y), "2n", time)
 			}
-		}, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "16n");
+		}, [0, 6+q, 9+q, 12+p, 18+q, 21+p], "6n");
 
 		Tone.Transport.start();
 
@@ -153,10 +193,14 @@
 			y = (y + 1) % 40;
 		}
 		addP = function () {
-			p = (p + 0.1) % 2;
+			// p = (p + 0.1) % 2;
+			p += 1;
+					Tone.Transport.start();
+
 		}
 		addQ = function () {
-			q = (q + 0.1) % 2;
+			// q = (q + 0.1) % 2;
+			q += 1;
 		}
 
 		playC = function () {

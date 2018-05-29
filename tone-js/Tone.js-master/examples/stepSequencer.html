@@ -57,6 +57,7 @@
 				if (column[i] === 1){
 					//slightly randomized velocities
 					var vel = Math.random() * 0.5 + 0.5;
+					console.log(noteNames[i] + "time: " + time);
 					keys.get(noteNames[i]).start(time, 0, "32n", 0, vel);
 				}
 			}

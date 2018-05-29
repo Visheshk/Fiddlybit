@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
+	  <link href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+	  <link href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
+	  <!-- <link href="/bower_components/bootstrap-slider/slider.css" rel="stylesheet"> -->
+	  
+	  <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+	  <script type="text/javascript" src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
+
+	  <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	  <script type="text/javascript" src="/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
+	  <script type="text/javascript" src="/bower_components/jQuery-Kontrol/js/jquery.kontrol.js"></script>
+	  <!-- <script type="text/javascript" src="/bower_components/bootstrap-slider/bootstrap-slider.js"></script> -->
+
+	  <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
+	  <script src="/socket.io/socket.io.js"></script>
+	  <script type="text/javascript" src="Tone.js"></script>
+
+	<script type="text/javascript" src="Tone.js"></script>
+	<script type="text/javascript">
+
+		var bass = new Tone.MonoSynth({
+			"volume" : -10,
+			"envelope" : {
+				"attack" : 0.1,
+				"decay" : 0.3,
+				"release" : 2,
+			},
+			"filterEnvelope" : {
+				"attack" : 0.001,
+				"decay" : 0.01,
+				"sustain" : 0.5,
+				"baseFrequency" : 200,
+				"octaves" : 2.6
+			}
+		}).toMaster();
+
+		var kick = new Tone.MembraneSynth({
+			"envelope" : {
+				"sustain" : 0,
+				"attack" : 0.02,
+				"decay" : 0.8
+			},
+			"octaves" : 10
+		}).toMaster();
+
+		var piano = new Tone.PolySynth(4, Tone.Synth, {
+			"volume" : -8,
+			"oscillator" : {
+				"partials" : [1, 2, 1],
+			},
+			"portamento" : 0.05
+		}).toMaster()
+		
+
+		var x = 2
+		var y = 19
+		var p = -0.23
+		var q = .75
+
+		var keys = new Tone.Players({
+			"A" : "./Tone.js-master/examples/audio/casio/A1.[mp3|ogg]",
+			"C#" : "./Tone.js-master/examples/audio/casio/Cs2.[mp3|ogg]",
+			"E" : "./Tone.js-master/examples/audio/casio/E2.[mp3|ogg]",
+			"F#" : "./Tone.js-master/examples/audio/casio/Fs2.[mp3|ogg]",
+		}, {
+			"volume" : -10,
+			"fadeOut" : "64n",
+		}).toMaster();
+
+		var piano = new Tone.PolySynth(4, Tone.Synth, {
+			"volume" : -8,
+			"oscillator" : {
+				"partials" : [1, 2, 1],
+			},
+			"portamento" : 0.05
+		}).toMaster()
+
+		var x = 12
+		var y = 10
+		var p = 0
+		var q = 0
+		
+		// var Chord1 = [349.228, 391.995, 440];
+		Chord1 = function (x, y) {
+			return [349.228, 391.995, 440];
+		}
+		// var Chord2 = [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		Chord2 = function (x, y) {
+			return [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		}
+		// var Chord3 = [349.228*y/10, 391.995*x/12, 440*y/10];
+		Chord3 = function (x, y) {
+			return [349.228*y/10, 391.995*x/12, 440*y/10];
+		}
+		// var pianoPart = new Tone.Part(function(time, chord){
+		// 	piano.triggerAttackRelease(chord, "4n", time);
+		// }, [[0, Chord1], 
+		// 	[6+q, Chord2], 
+		// 	[9+q, Chord3], 
+		// 	[12+p, Chord3], 
+		// 	[18+q, Chord2], 
+		// 	[21+p, Chord3]]).start(0);
+		// pianoPart.loop = true;
+		// pianoPart.loopEnd = 24;
+
+		//the notes
+		// var noteNames = ["F#", "E", "C#", "A"];
+
+		var chordList = [Chord1, Chord2, Chord3, Chord3, Chord2, Chord3];
+
+		var loop = new Tone.Sequence(function(time, col){
+			// var column = matrix1.matrix[col];
+			for (var i = 0; i < 6; i++){
+				console.log( i + " " + time);
+				piano.triggerAttackRelease(chordList[i](x, y), "2n", time)
+			}
+		}, [0, 6+q, 9+q, 12+p, 18+q, 21+p], "6n");
+
+		Tone.Transport.start();
+
+
+		addX = function () {
+			x = (x + 1) % 4;
+			console.log(x);
+			makeNoteList();
+		}
+		addY = function () {
+			y = (y + 1) % 40;
+			makeNoteList();
+
+		}
+		addP = function () {
+			// p = (p + 0.1) % 2;
+			p += 200;
+					// Tone.Transport.start();
+			makeTimeList();
+
+		}
+		addQ = function () {
+			// q = (q + 0.1) % 2;
+			q += 200;
+			makeTimeList();
+		}
+
+		playingVar = false;
+		seqLength = 6;
+		noteIndex = -1;
+		var bassTimeList = [];
+		var bassNoteList = [];
+		var bassNoteIndex = -1;
+		// var 
+
+		makeTimeList = function () {
+			def = 750;
+			bassTimeList = [
+				0, 
+				def, 
+				def, 
+				def, 
+				def + p, 
+				def + q, 
+				def + p, 
+				def + def + p,
+				def,
+				def + q,
+				def + def + p,
+				def,
+				def + p,
+				def + def + q,
+				def + p,
+				def + p,
+				def + q,
+				def + q,
+				def,
+				def + p,
+				def + p,
+				def + q,
+				def + q,
+				def + p,
+				def + p,
+				def]
+		}
+
+		makeTimeList();
+
+		makeNoteList = function () {
+			bassNoteList = [
+			220, 
+			195.998, 
+			175.614, 
+			195.998, 
+			220*x/12, 
+			220*y/10,
+			220,
+			195.998*x/12,
+			195.998*y/10,
+			195.998,
+			220*x/12,
+			261.626*x/12,
+			261.626*y/10,
+			220*y/10,
+			195.998*x/12,
+			174.614*y/10,
+			195.998,
+			220*y/10,
+			220*x/12,
+			220*x/12,
+			220*y/10,
+			195.998*x/12,
+			195.998,
+			220*x/12,
+			195.998*x/12,
+			174.614*y/10]
+		}
+
+		makeNoteList();
+
+		pianoNoteStepper = function () {
+			if (playingVar == true) {
+				// noteIndex = (noteIndex + 1) % seqLength;
+				// setTimeout(playPNote, waitLengths[noteIndex]);
+			}
+		}
+
+		bassNoteStepper = function () {
+			if (playingVar == true) {
+				bassNoteIndex = (bassNoteIndex + 1) % seqLength;
+					setTimeout(playBNote, bassTimeList[bassNoteIndex]);
+			}
+		}
+
+		playPNote = function () {
+			piano.triggerAttackRelease(chordList[noteIndex](x, y), "2n");
+			pianoNoteStepper();
+		}
+
+		playBNote = function () {
+			bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "32n");
+			bassNoteStepper();
+		}
+
+		startPlay = function () {
+			bassNoteStepper();
+		}
+
+		playC = function () {
+			// Tone.Transport.start("+0.1");
+			// Tone.Transport.start();
+			// loop.start();
+			playingVar = true;
+			startPlay();
+		}
+		playD = function () {
+			// Tone.Transport.stop();
+			// loop.stop();
+			playingVar = false;
+		}
+
+
+		
+
+	</script>
+</head>
+<body>
+	<button onclick="playC()">Start Loop</button>
+	<button onclick="addX()">Add to x</button>
+	<button onclick="addY()">Add to y</button>
+	<button onclick="addP()">Add to p</button>
+	<button onclick="addQ()">Add to q</button>
+	<button onclick="playD()">Stop Loop</button>
+</body>
+</html>
