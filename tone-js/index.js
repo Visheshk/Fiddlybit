@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var OSC = require('osc-js');
+var Tone = require('tone');
 var port = process.env.PORT || 3000;
 // var Worker = require('webworker-threads').Worker;
 // require('handlebars');
@@ -27,6 +28,8 @@ app.get('/manual', function(req, res){
 
 });
 
+
+app.use(express.static('public/'));
 
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 

@@ -2,22 +2,6 @@
 <html>
 <head>
 	<title></title>
-	  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
-	  <link href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
-	  <link href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
-	  <!-- <link href="/bower_components/bootstrap-slider/slider.css" rel="stylesheet"> -->
-	  
-	  <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
-	  <script type="text/javascript" src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
-
-	  <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
-	  <script type="text/javascript" src="/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
-	  <script type="text/javascript" src="/bower_components/jQuery-Kontrol/js/jquery.kontrol.js"></script>
-	  <!-- <script type="text/javascript" src="/bower_components/bootstrap-slider/bootstrap-slider.js"></script> -->
-
-	  <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
-	  <script src="/socket.io/socket.io.js"></script>
-	  <!-- <script type="text/javascript" src="Tone.js"></script> -->
 
 	<script type="text/javascript" src="Tone.js"></script>
 	<script type="text/javascript">
@@ -56,11 +40,6 @@
 		}).toMaster()
 		
 
-		var x = 2
-		var y = 19
-		var p = -0.23
-		var q = .75
-
 		var keys = new Tone.Players({
 			"A" : "./Tone.js-master/examples/audio/casio/A1.[mp3|ogg]",
 			"C#" : "./Tone.js-master/examples/audio/casio/Cs2.[mp3|ogg]",
@@ -78,12 +57,12 @@
 			},
 			"portamento" : 0.05
 		}).toMaster()
-
+		
 		var x = 12
 		var y = 10
 		var p = 0
 		var q = 0
-		
+
 		// var Chord1 = [349.228, 391.995, 440];
 		Chord1 = function (x, y) {
 			return [349.228, 391.995, 440];
@@ -135,14 +114,14 @@
 		}
 		addP = function () {
 			// p = (p + 0.1) % 2;
-			p += 200;
+			p += 50;
 					// Tone.Transport.start();
 			makeTimeList();
 
 		}
 		addQ = function () {
 			// q = (q + 0.1) % 2;
-			q += 200;
+			q += 50;
 			makeTimeList();
 		}
 
@@ -170,43 +149,60 @@
 		}
 
 		playingVar = false;
-		seqLength = 27;
+		// seqLength = 27;
 		noteIndex = -1;
+		var bassSeqLength = 27;
 		var bassTimeList = [];
 		var bassNoteList = [];
 		var bassNoteIndex = -1;
+		
+		var pianoSeqLength = 7;
+		var pianoTimeList = [];
+		var pianoNoteList = [];
+		var pianoNoteIndex = -1;
 		// var 
 
 		makeTimeList = function () {
 			def = 750;
+			pstart = 0;
+			qstart = 0
 			bassTimeList = [
 				0, 
 				def, 
 				def, 
 				def, 
-				def + p, 
-				def + q, 
-				def + p, 
-				def + def + p,
+				def + pstart + p, 
+				def + qstart + q, 
+				def + pstart + p, 
+				def + def + pstart + p,
 				def,
-				def + q,
-				def + def + p,
+				def + qstart + q,
+				def + def + pstart + p,
 				def,
-				def + p,
-				def + def + q,
-				def + p,
-				def + p,
-				def + q,
-				def + q,
+				def + pstart + p,
+				def + def + qstart + q,
+				def + pstart + p,
+				def + pstart + p,
+				def + qstart + q,
+				def + qstart + q,
 				def,
-				def + p,
-				def + p,
-				def + q,
-				def + q,
-				def + p,
-				def + p,
+				def + pstart + p,
+				def + pstart + p,
+				def + qstart + q,
+				def + qstart + q,
+				def + pstart + p,
+				def + pstart + p,
 				def,
-				def+def+def+def]
+				def+def+def+def];
+
+			pianoTimeList = [
+				0,
+				def + def + def + def + def + def + def + def,
+				def + def + def + def,
+				def + def + def + def,
+				def + def + def + def + def + def + def + def,
+				def + def + def + def,
+				def + def + def + def];
 		}
 
 		makeTimeList();
@@ -238,27 +234,38 @@
 			195.998,
 			220*x/12,
 			195.998*x/12,
-			174.614*y/10]
+			174.614*y/10];
+			bassSeqLength = bassNoteList.length;
+
+			pianoNoteList = [
+				[349.228, 391.995, 440],
+				[261.626*x/12, 293.665*x/12, 329.628*y/10],
+				[349.228*y/10, 391.995*x/12, 440*y/10],
+				[349.228*y/10, 391.995*x/12, 440*y/10],
+				[261.626*x/12, 293.665*x/12, 329.628*y/10],
+				[349.228*y/10, 391.995*x/12, 440*y/10]
+			];
+			pianoSeqLength = pianoNoteList.length;
 		}
 
 		makeNoteList();
 
 		pianoNoteStepper = function () {
 			if (playingVar == true) {
-				// noteIndex = (noteIndex + 1) % seqLength;
-				// setTimeout(playPNote, waitLengths[noteIndex]);
+			pianoNoteIndex = (pianoNoteIndex + 1) % pianoSeqLength;
+					setTimeout(playPNote, pianoTimeList[pianoNoteIndex]);
 			}
 		}
 
 		bassNoteStepper = function () {
 			if (playingVar == true) {
-				bassNoteIndex = (bassNoteIndex + 1) % seqLength;
+				bassNoteIndex = (bassNoteIndex + 1) % bassSeqLength;
 					setTimeout(playBNote, bassTimeList[bassNoteIndex]);
 			}
 		}
 
 		playPNote = function () {
-			piano.triggerAttackRelease(chordList[noteIndex](x, y), "2n");
+			piano.triggerAttackRelease(pianoNoteList[pianoNoteIndex], "2n");
 			pianoNoteStepper();
 		}
 
@@ -269,6 +276,7 @@
 
 		startPlay = function () {
 			bassNoteStepper();
+			pianoNoteStepper();
 		}
 
 		playC = function () {
