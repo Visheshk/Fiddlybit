@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var OSC = require('osc-js');
 // var Tone = require('tone');
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 18010;
 // var Worker = require('webworker-threads').Worker;
 // require('handlebars');
 
@@ -243,6 +243,6 @@ io.on('connection', function(socket){
 
 });
 
-http.listen(3000, function(){
+http.listen(18010, function(){
   console.log('listening on *:3000');
 });
