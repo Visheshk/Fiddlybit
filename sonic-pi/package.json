@@ -4,14 +4,14 @@
   "description": "my first socket.io app",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
-    "@fortawesome/fontawesome-pro-solid": "^5.0.13",
+    // "@fortawesome/fontawesome-pro-solid": "^5.0.13",
     "bootstrap-slider": "^10.0.0",
     "bower": "^1.8.4",
     "express": "^4.16.3",
     "handlebars": "^4.0.11",
-    "osc": "^2.2.2",
-    "osc-js": "^1.2.2",
-    "osc-min": "^1.1.1",
+    // "osc": "^2.2.2",
+    // "osc-js": "^1.2.2",
+    // "osc-min": "^1.1.1",
     "socket.io": "^2.1.1",
     "tone": "^0.11.12"
   }
