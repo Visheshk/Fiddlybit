@@ -23,6 +23,7 @@
 		}).toMaster();
 
 		var kick = new Tone.MembraneSynth({
+			"volume" : -10,
 			"envelope" : {
 				"sustain" : 0,
 				"attack" : 0.02,
@@ -32,34 +33,15 @@
 		}).toMaster();
 
 		var piano = new Tone.PolySynth(4, Tone.Synth, {
-			"volume" : -8,
-			"oscillator" : {
-				"partials" : [1, 2, 1],
-			},
-			"portamento" : 0.05
-		}).toMaster()
-		
-
-		var keys = new Tone.Players({
-			"A" : "./Tone.js-master/examples/audio/casio/A1.[mp3|ogg]",
-			"C#" : "./Tone.js-master/examples/audio/casio/Cs2.[mp3|ogg]",
-			"E" : "./Tone.js-master/examples/audio/casio/E2.[mp3|ogg]",
-			"F#" : "./Tone.js-master/examples/audio/casio/Fs2.[mp3|ogg]",
-		}, {
 			"volume" : -10,
-			"fadeOut" : "64n",
-		}).toMaster();
-
-		var piano = new Tone.PolySynth(4, Tone.Synth, {
-			"volume" : -8,
 			"oscillator" : {
 				"partials" : [1, 2, 1],
 			},
 			"portamento" : 0.05
 		}).toMaster()
 		
-		var x = 2
-		var y = 19
+		var x = 12
+		var y = 10
 		var p = 0
 		var q = 0
 
@@ -151,21 +133,27 @@
 		playingVar = false;
 		// seqLength = 27;
 		noteIndex = -1;
-		var bassSeqLength = 27;
+		bassSeqLength = 27;
 		var bassTimeList = [];
 		var bassNoteList = [];
 		var bassNoteIndex = -1;
 		
-		var pianoSeqLength = 5;
+		pianoSeqLength = 7;
 		var pianoTimeList = [];
 		var pianoNoteList = [];
 		var pianoNoteIndex = -1;
+
+		kickSeqLength = 17
+		var kickTimeList = [];
+		var kickNoteList = [];
+		var kickNoteIndex = -1;
+		
 		// var 
 
 		makeTimeList = function () {
 			def = 750;
-			pstart = -600;
-			qstart = 1500
+			pstart = 0;
+			qstart = 0;
 			bassTimeList = [
 				0, 
 				def, 
@@ -193,16 +181,35 @@
 				def + pstart + p,
 				def + pstart + p,
 				def,
-				def+def+def+def];
+				def + def + def + def];
 
 			pianoTimeList = [
-				0,
-				def + def + def + def + def + def + def + def,
-				def + def + def + def,
-				def + def + def + def,
-				def + def + def + def + def + def + def + def,
-				def + def + def + def,
-				def + def + def + def]
+				0, 
+				def + def + def + def + pstart + p + def + qstart + q + def + pstart + p + def + def + pstart + p,
+				def + def + qstart + q + def + def + pstart + p,
+				def + def + pstart + p + def + def + qstart + q,
+				def + pstart + p + def + pstart + p + def + qstart + q + def + qstart + q + def + def + pstart + p + def + pstart + p + def + qstart + q,
+				def + qstart + q + def + pstart + p + def + pstart + p + def,
+				def + def + def + def];
+
+			kickTimeList = [
+				0, 
+				def + def, 
+				def + def + pstart + p, 
+				def + qstart + q + def + pstart + p, 
+				def + def + pstart + p,
+				def + def + qstart + q,
+				def + def + pstart + p,
+				def + def + pstart + p,
+				def + def + qstart + q,
+				def + pstart + p + def + pstart + p,
+				def + qstart + q + def + qstart + q,
+				def + def + pstart + p,
+				def + pstart + p + def + qstart + q,
+				def + qstart + q + def + pstart + p,
+				def + pstart + p + def,
+				def + def,
+				def + def];
 		}
 
 		makeTimeList();
@@ -246,37 +253,69 @@
 				[349.228*y/10, 391.995*x/12, 440*y/10]
 			];
 			pianoSeqLength = pianoNoteList.length;
+
+			kickNoteList = [
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41];
+			kickSeqLength = kickNoteList.length;
 		}
 
 		makeNoteList();
 
 		pianoNoteStepper = function () {
 			if (playingVar == true) {
-			pianoNoteIndex = (pianoNoteIndex + 1) % pianoSeqLength;
+			pianoNoteIndex = (pianoNoteIndex + 1) % 7;
 					setTimeout(playPNote, pianoTimeList[pianoNoteIndex]);
 			}
 		}
 
 		bassNoteStepper = function () {
 			if (playingVar == true) {
-				bassNoteIndex = (bassNoteIndex + 1) % bassSeqLength;
+				bassNoteIndex = (bassNoteIndex + 1) % 27;
 					setTimeout(playBNote, bassTimeList[bassNoteIndex]);
 			}
 		}
 
+		kickNoteStepper = function () {
+			if (playingVar == true) {
+				kickNoteIndex = (kickNoteIndex + 1) % 17;
+					setTimeout(playKNote, kickTimeList[kickNoteIndex]);
+			}
+		}
+
 		playPNote = function () {
-			piano.triggerAttackRelease(pianoNoteList[pianoNoteIndex], "2n");
+			piano.triggerAttackRelease(pianoNoteList[pianoNoteIndex], "4n");
 			pianoNoteStepper();
 		}
 
 		playBNote = function () {
-			bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "32n");
+			bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "8n");
 			bassNoteStepper();
+		}
+
+		playKNote = function () {
+			kick.triggerAttackRelease(kickNoteList[kickNoteIndex], "32n");
+			kickNoteStepper();
 		}
 
 		startPlay = function () {
 			bassNoteStepper();
 			pianoNoteStepper();
+			kickNoteStepper()
 		}
 
 		playC = function () {
