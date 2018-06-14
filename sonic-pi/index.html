@@ -248,27 +248,25 @@
         socket.emit("send variable vals");
       }
 
-      socket.on("chat message", function (msg) {
-        console.log("receiving " + msg);
-        $("#messages").append($('<li>').text(msg));
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-
       correctDots = ["#d1", "#d2", "#d3", "#d4", "#d5", "#d6"];
 
       socket.on("correctUpdate", function (corrects) { 
+        console.log(corrects);
         for (k in corrects) {
           // if (k == 1) {
             // $("#correctDots[k]").
-            red = 190 - (corrects[k] * 190/255);
+            // red = 190 - (corrects[k] * 190/255);
+            
             // console.log("rgba(190," + corrects[k] + ", 190, " + (0.5 + (corrects[k]/255)));
-            $(correctDots[k]).css("background-color","rgba(" + red + "," + corrects[k] + "," + red + "," + (0.5 + (corrects[k]/255)) );
+            // $(correctDots[k]).css("background-color","rgba(" + red + "," + corrects[k] + "," + red + "," + (0.5 + (corrects[k]/255)) );
+            $(correctDots[k]).css("background-color","rgba(" + red + "," + corrects[k] + "," + red + ",255" );
+
           // }
         }
       });
 
       socket.on("variable values", function (servervals) {
-        console.log(servervals)
+        // console.log(servervals)
         vals = servervals;
         x = vals["x"];
         y = vals["y"];
@@ -282,6 +280,16 @@
 
           // $("#" + vals[v].docid ).html("" + vals[v].val);
 
+        }
+
+      });
+
+      socket.on("correct updates", function (corrects) {
+        // console.log(servervals)
+        
+        console.log(corrects);
+        for (k in corrects) {
+          $(correctDots[k]).css("background-color","rgba(0," + corrects[k]*255 + ",0 ,255" );
         }
 
       });

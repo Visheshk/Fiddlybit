@@ -54,7 +54,7 @@ variables = {
   "q": 630 
 }
 
-corrects = [0, 0, 0, 0, 0, 0]
+corrects = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 correctVals = [0, 0, 0, 0, 0, 0]
 lastCorrects = [0, 0, 0, 0, 0, 0]
 
@@ -145,7 +145,7 @@ io.on('connection', function(socket){
   checkCorrects = function () {
     i = 0;
     for (k in variables) {
-      
+      corrects[i] = 1 - ((Math.abs(variables[k] - varAnswers[k]) * 1.0) / (vnc[k][3] - vnc[k][2]));
       i++;
     }
     // console.log(correctVals)
@@ -219,9 +219,11 @@ io.on('connection', function(socket){
     // console.log(vs);
     convertedVal = scaleVal(vnc[varNameConnects[vs[1]]], vs[0]);
     variables[varNameConnects[vs[1]]] = convertedVal;
+    checkCorrects();
     io.emit("variable values", variables);
+    io.emit("correct updates", corrects);
     // console.log(variables);
-    // checkCorrects();
+    
   });
 
   socket.on('speedChange', function (dir) {
@@ -244,5 +246,5 @@ io.on('connection', function(socket){
 });
 
 http.listen(18010, function(){
-  console.log('listening on *:3000');
+  console.log('listening on *:18010');
 });
