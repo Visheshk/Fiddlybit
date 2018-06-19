@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<script type="text/javascript" src="Tone.js"></script>
+	<script type="text/javascript">
+
+		var bass = new Tone.MonoSynth({
+			"volume" : -10,
+			"envelope" : {
+				"attack" : 0.1,
+				"decay" : 0.3,
+				"release" : 2,
+			},
+			"filterEnvelope" : {
+				"attack" : 0.001,
+				"decay" : 0.01,
+				"sustain" : 0.5,
+				"baseFrequency" : 200,
+				"octaves" : 2.6
+			}
+		}).toMaster();
+
+		var kick = new Tone.MembraneSynth({
+			"volume" : -10,
+			"envelope" : {
+				"sustain" : 0,
+				"attack" : 0.02,
+				"decay" : 0.8
+			},
+			"octaves" : 10
+		}).toMaster();
+
+		var piano = new Tone.PolySynth(4, Tone.Synth, {
+			"volume" : -10,
+			"oscillator" : {
+				"partials" : [1, 2, 1],
+			},
+			"portamento" : 0.05
+		}).toMaster()
+		
+		var x = 15
+		var y = 9
+		var p = 0
+		var q = 0
+
+		// var Chord1 = [349.228, 391.995, 440];
+		Chord1 = function (x, y) {
+			return [349.228, 391.995, 440];
+		}
+		// var Chord2 = [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		Chord2 = function (x, y) {
+			return [261.626*x/12, 293.665*x/12, 329.628*y/10];
+		}
+		// var Chord3 = [349.228*y/10, 391.995*x/12, 440*y/10];
+		Chord3 = function (x, y) {
+			return [349.228*y/10, 391.995*x/12, 440*y/10];
+		}
+		// var pianoPart = new Tone.Part(function(time, chord){
+		// 	piano.triggerAttackRelease(chord, "4n", time);
+		// }, [[0, Chord1], 
+		// 	[6+q, Chord2], 
+		// 	[9+q, Chord3], 
+		// 	[12+p, Chord3], 
+		// 	[18+q, Chord2], 
+		// 	[21+p, Chord3]]).start(0);
+		// pianoPart.loop = true;
+		// pianoPart.loopEnd = 24;
+
+		//the notes
+		// var noteNames = ["F#", "E", "C#", "A"];
+
+		var chordList = [Chord1, Chord2, Chord3, Chord3, Chord2, Chord3];
+
+		var loop = new Tone.Sequence(function(time, col){
+			// var column = matrix1.matrix[col];
+			for (var i = 0; i < 6; i++){
+				console.log( i + " " + time);
+				piano.triggerAttackRelease(chordList[i](x, y), "2n", time)
+			}
+		}, [0, 6+q, 9+q, 12+p, 18+q, 21+p], "6n");
+
+		Tone.Transport.start();
+
+
+		addX = function () {
+			x = (x + 1) % 4;
+			console.log(x);
+			makeNoteList();
+		}
+		addY = function () {
+			y = (y + 1) % 40;
+			makeNoteList();
+
+		}
+		addP = function () {
+			// p = (p + 0.1) % 2;
+			p += 50;
+					// Tone.Transport.start();
+			makeTimeList();
+
+		}
+		addQ = function () {
+			// q = (q + 0.1) % 2;
+			q += 50;
+			makeTimeList();
+		}
+
+		subX = function () {
+			x = (x - 1) % 4;
+			console.log(x);
+			makeNoteList();
+		}
+		subY = function () {
+			y = (y - 1) % 40;
+			makeNoteList();
+
+		}
+		subP = function () {
+			// p = (p + 0.1) % 2;
+			p -= 200;
+					// Tone.Transport.start();
+			makeTimeList();
+
+		}
+		subQ = function () {
+			// q = (q + 0.1) % 2;
+			q -= 200;
+			makeTimeList();
+		}
+
+		playingVar = false;
+		// seqLength = 27;
+		noteIndex = -1;
+		bassSeqLength = 21;
+		var bassTimeList = [];
+		var bassNoteList = [];
+		var bassNoteIndex = -1;
+		
+		pianoSeqLength = 8;
+		var pianoTimeList = [];
+		var pianoNoteList = [];
+		var pianoNoteIndex = -1;
+
+		kickSeqLength = 34
+		var kickTimeList = [];
+		var kickNoteList = [];
+		var kickNoteIndex = -1;
+		var instrumentCount = 3;
+		var readyToStart = 0;
+		
+		// var 
+
+		makeTimeList = function () {
+			def = 300;
+			pstart = 0;
+			qstart = 0;
+			bassTimeList = [
+				0, 
+				def + def, 
+				def, 
+				def + def, 
+				def + p, 
+				def + def + def + q, 
+				def + def + def, 
+				def + def + q, 
+				def + p, 
+				def + def + q, 
+				def + q, 
+				def + def + def + p, 
+				def + def + def + q, 
+				def + def + def,
+				def + def + def + p,
+				def + def + def + p,
+				def + def + p, 
+				def + q,
+				def + def + def + p, 
+				def + def + def + q, 
+				def + def + def + def + def + def,];
+
+			pianoTimeList = [
+				0, 
+				def + def + def + def + def + def + def + def + def + def + def + def + q + q,
+				def + def + def + def + def + def + def + def + def + def + def + def + p + p + p + p,
+				def + def + def + def + def + def + q + q,
+				def + def + def + def + def + def + q,
+				def + def + def + p + p + p,
+				def + def + def + q + q,
+				def + def + def + def + def + def];
+
+			kickTimeList = [
+				0, 
+				def + def, 
+				def,
+				def + def, 
+				def,
+				def + def, 
+				def + q,
+				def + def, 
+				def + p,
+				def + def + p, 
+				def + p,
+				def + def + q, 
+				def + q,
+				def + def + q, 
+				def + q,
+				def + def + p, 
+				def,
+				def + def + p, 
+				def + q,
+				def + def, 
+				def + q,
+				def + def, 
+				def + p,
+				def + def, 
+				def + p,
+				def + def, 
+				def,
+				def + def, 
+				def,
+				def + def, 
+				def,
+				def + def, 
+				def,
+				def + def];
+		}
+
+		makeTimeList();
+
+		makeNoteList = function () {
+			bassNoteList = [
+			196, 
+			196, 
+			164.81, 
+			220, 
+			196*x/15, 
+			164.81*y/9,
+			196*x/15, 
+			196*x/15, 
+			164.81*y/9, 
+			220, 
+			196*x/15, 
+			164.81*y/9,
+			174.61*y/9,
+			146.83*x/15,
+			174.62*y/9,
+			146.83*x/15,
+			164.81*y/9,
+			196*x/15, 
+			196*x/15,
+			130.81];
+			bassSeqLength = bassNoteList.length;
+
+			pianoNoteList = [
+				[261.63, 329.63, 392.00],
+				[261.63*x/15, 329.63*y/9, 392.00],
+				[293.67*x/15, 349.23*y/9, 440],
+				[293.67*x/15, 349.23*y/9, 440],
+				[392.00*x/15, 493.88*y/9, 587.33],
+				[392.00*x/15, 493.88*y/9, 587.33],
+				[261.63*x/15, 329.63*y/9, 392.00]
+			];
+			pianoSeqLength = pianoNoteList.length;
+
+			kickNoteList = [
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41,
+			65.41];
+			kickSeqLength = kickNoteList.length;
+		}
+
+		makeNoteList();
+
+		pianoNoteStepper = function () {
+			if (playingVar == true) {
+				pianoNoteIndex = (pianoNoteIndex + 1);
+				if (pianoNoteIndex < pianoSeqLength)
+					setTimeout(playPNote, pianoTimeList[pianoNoteIndex]);
+				else {
+					readyToStart = readyToStart - 1;
+					console.log("paino ending ready to start " + readyToStart);
+					startPlay();
+				}
+			}
+		}
+
+		bassNoteStepper = function () {
+			if (playingVar == true ) {
+				bassNoteIndex = bassNoteIndex + 1;
+				if (bassNoteIndex < bassSeqLength){
+					setTimeout(playBNote, bassTimeList[bassNoteIndex]);
+				}
+				else {
+					console.log("bass ending ready to start " + readyToStart);
+					readyToStart = readyToStart - 1;
+					startPlay();
+				}
+			}
+		}
+
+		kickNoteStepper = function () {
+			if (playingVar == true) {
+				kickNoteIndex = (kickNoteIndex + 1);
+				if (kickNoteIndex < kickSeqLength){
+					setTimeout(playKNote, kickTimeList[kickNoteIndex]);
+				}
+				else {
+					console.log("kick ending ready to start " + readyToStart);
+					readyToStart = readyToStart - 1;
+					startPlay();	
+				}
+			}
+		}
+
+		playPNote = function () {
+			piano.triggerAttackRelease(pianoNoteList[pianoNoteIndex], "4n");
+			pianoNoteStepper();
+		}
+
+		playBNote = function () {
+			bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "8n");
+			bassNoteStepper();
+		}
+
+		playKNote = function () {
+			kick.triggerAttackRelease(kickNoteList[kickNoteIndex], "32n");
+			kickNoteStepper();
+		}
+
+		startPlay = function () {
+			console.log(readyToStart + " over here");
+			if (readyToStart == 0){
+				console.log("calling functions again");
+				readyToStart = instrumentCount;
+				bassNoteIndex = -1;
+				kickNoteIndex = -1;
+				pianoNoteIndex = -1;
+				bassNoteStepper();
+				pianoNoteStepper();
+				kickNoteStepper()
+			}
+		}
+
+		playC = function () {
+			// Tone.Transport.start("+0.1");
+			// Tone.Transport.start();
+			// loop.start();
+			playingVar = true;
+			readyToStart = 0;
+			startPlay();
+		}
+		playD = function () {
+			// Tone.Transport.stop();
+			// loop.stop();
+			playingVar = false;
+			// readyToStart = 0;
+		}
+
+		
+		
+	</script>
+</head>
+<body>
+	<button onclick="playC()">Start Loop</button>
+	<button onclick="addX()">Add to x</button>
+	<button onclick="subX()">Sub from x</button>
+	<button onclick="addY()">Add to y</button>
+	<button onclick="subY()">Sub from y</button>
+	<button onclick="addP()">Add to p</button>
+	<button onclick="subP()">Sub from P</button>
+	<button onclick="addQ()">Add to q</button>
+	<button onclick="subQ()">Sub from Q</button>
+	<button onclick="playD()">Stop Loop</button>
+</body>
+</html>

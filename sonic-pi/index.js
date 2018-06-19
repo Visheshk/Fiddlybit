@@ -18,8 +18,11 @@ var port = process.env.PORT || 18010;
 // osc.open() // listening on 'ws://localhost:8080'
 
 
+homePage = "/index.html";
+puzzlePages = ["/index.html", "/puzzle-1.html"];
+
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + "" + homePage);
 
 });
 
@@ -38,7 +41,8 @@ playing = 0;
 lastNotePlay = Date.now();
 notePlaying = 0;
 release = 1;
-
+feedback = 1;
+puzzle = 0;
 varAnswers = {
   "x": 12,
   "y": 10,
@@ -53,6 +57,34 @@ variables = {
   "p": -440,
   "q": 630 
 }
+
+startVars = [
+  { "x": 2,
+    "y": 19,
+    "p": -440,
+    "q": 630 } ,
+  { "x": 19,
+    "y": 3,
+    "p": -250,
+    "q": 900 }
+]
+
+ansVars = [
+  { "x": 12,
+    "y": 10,
+    "p": 0,
+    "q": 0 } ,
+  { "x": 15,
+    "y": 9,
+    "p": 0,
+    "q": 0 }
+]
+
+
+  // var x = 19
+  //   var y = 3
+  //   var p = -250
+  //   var q = 900
 
 corrects = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 correctVals = [0, 0, 0, 0, 0, 0]
@@ -82,6 +114,17 @@ checkPlayState = function () {
   return(playing);
 }
 
+updatePuzzleVars = function (puzzleNo) {
+  variables = startVars[puzzleNo];
+  varAnswers = ansVars[puzzleNo];
+  homePage = puzzlePages[puzzleNo];
+}
+
+updateHomePage = function () {
+  io.emit('refresh page');
+}
+
+
 note = 0
 varval = 0
 rel = 0
@@ -94,6 +137,15 @@ getValue = function (note) {
   }
   else {
     return note;
+  }
+}
+
+emitFeedback = function () {
+  if (feedback == 0) {
+    io.emit('feedback', 'Off');
+  }
+  else {
+    io.emit('feedback', 'On');
   }
 }
 
@@ -113,16 +165,6 @@ io.on('connection', function(socket){
   socket.on('play', function (state) {
     
     variableChange();
-  });
-
-  socket.on('releaseChange', function (dir) {
-    release = release + (dir * 0.2);
-    if (release < 0) {
-      release = 0.2
-    }
-    else if (release > 10) {
-      release = 1;
-    }
   });
 
 //vnc is, for each variable name [scale] converter.
@@ -146,7 +188,9 @@ io.on('connection', function(socket){
     i = 0;
     for (k in variables) {
       corrects[i] = 1 - ((Math.abs(variables[k] - varAnswers[k]) * 1.0) / (vnc[k][3] - vnc[k][2]));
+      corrects[i] = corrects[i] * feedback;
       i++;
+
     }
     // console.log(correctVals)
     // io.emit("correctUpdate", correctVals);
@@ -226,6 +270,7 @@ io.on('connection', function(socket){
     
   });
 
+  /*
   socket.on('speedChange', function (dir) {
     ticklength = ticklength + (dir * 150);
     if (ticklength > 2000) {
@@ -238,10 +283,25 @@ io.on('connection', function(socket){
     updateVals();
     variableChange();
   });
-
+  */
   socket.on('send variable vals', function () {
     variableChange();
-  })
+  });
+
+  socket.on('Change Feedback', function () {
+    console.log("changing feedback " + feedback);
+    feedback = 1 - feedback;
+    emitFeedback();
+  });
+
+  socket.on('Next Puzzle', function () {
+    console.log("nexting da puzzle");
+    puzzle = (puzzle + 1) % 2;
+    updatePuzzleVars(puzzle);
+    updateHomePage();
+    io.emit('refresh page');
+
+  });  
 
 });
 
