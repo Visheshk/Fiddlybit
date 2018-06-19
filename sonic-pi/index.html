@@ -83,72 +83,111 @@
       }
     }).toMaster();
 
+    var kick = new Tone.MembraneSynth({
+      "volume" : -10,
+      "envelope" : {
+        "sustain" : 0,
+        "attack" : 0.02,
+        "decay" : 0.8
+      },
+      "octaves" : 10
+    }).toMaster();
 
-    var x = 2
-    var y = 19
-    var p = -0.23
-    var q = .75
-
-    addX = function () {
-      x = (x + 1) % 4;
-      console.log(x);
-      makeNoteList();
-    }
-    addY = function () {
-      y = (y + 1) % 40;
-      makeNoteList();
-
-    }
-    addP = function () {
-      // p = (p + 0.1) % 2;
-      p += 200;
-          // Tone.Transport.start();
-      makeTimeList();
-
-    }
-    addQ = function () {
-      // q = (q + 0.1) % 2;
-      q += 200;
-      makeTimeList();
-    }
+    var piano = new Tone.PolySynth(4, Tone.Synth, {
+      "volume" : -10,
+      "oscillator" : {
+        "partials" : [1, 2, 1],
+      },
+      "portamento" : 0.05
+    }).toMaster()
+    
+    var x = 12
+    var y = 10
+    var p = 0
+    var q = 0
 
     playingVar = false;
-    seqLength = 6;
+    // seqLength = 27;
     noteIndex = -1;
+    bassSeqLength = 27;
     var bassTimeList = [];
     var bassNoteList = [];
     var bassNoteIndex = -1;
+    
+    pianoSeqLength = 7;
+    var pianoTimeList = [];
+    var pianoNoteList = [];
+    var pianoNoteIndex = -1;
+
+    kickSeqLength = 17
+    var kickTimeList = [];
+    var kickNoteList = [];
+    var kickNoteIndex = -1;
+    var instrumentCount = 3;
+    var readyToStart = 0;
+    
     // var 
 
     makeTimeList = function () {
       def = 750;
+      pstart = 0;
+      qstart = 0;
       bassTimeList = [
         0, 
         def, 
         def, 
         def, 
-        def + p, 
-        def + q, 
-        def + p, 
-        def + def + p,
+        def + pstart + p, 
+        def + qstart + q, 
+        def + pstart + p, 
+        def + def + pstart + p,
         def,
-        def + q,
-        def + def + p,
+        def + qstart + q,
+        def + def + pstart + p,
         def,
-        def + p,
-        def + def + q,
-        def + p,
-        def + p,
-        def + q,
-        def + q,
+        def + pstart + p,
+        def + def + qstart + q,
+        def + pstart + p,
+        def + pstart + p,
+        def + qstart + q,
+        def + qstart + q,
         def,
-        def + p,
-        def + p,
-        def + q,
-        def + q,
-        def + p,
-        def + p,
-        def]
+        def + pstart + p,
+        def + pstart + p,
+        def + qstart + q,
+        def + qstart + q,
+        def + pstart + p,
+        def + pstart + p,
+        def,
+        def + def + def + def];
+
+      pianoTimeList = [
+        0, 
+        def + def + def + def + pstart + p + def + qstart + q + def + pstart + p + def + def + pstart + p,
+        def + def + qstart + q + def + def + pstart + p,
+        def + def + pstart + p + def + def + qstart + q,
+        def + pstart + p + def + pstart + p + def + qstart + q + def + qstart + q + def + def + pstart + p + def + pstart + p + def + qstart + q,
+        def + qstart + q + def + pstart + p + def + pstart + p + def,
+        def + def + def + def];
+
+      kickTimeList = [
+        0, 
+        def + def, 
+        def + def + pstart + p, 
+        def + qstart + q + def + pstart + p, 
+        def + def + pstart + p,
+        def + def + qstart + q,
+        def + def + pstart + p,
+        def + def + pstart + p,
+        def + def + qstart + q,
+        def + pstart + p + def + pstart + p,
+        def + qstart + q + def + qstart + q,
+        def + def + pstart + p,
+        def + pstart + p + def + qstart + q,
+        def + qstart + q + def + pstart + p,
+        def + pstart + p + def,
+        def + def,
+        def + def];
     }
 
     makeTimeList();
@@ -180,38 +219,124 @@
       195.998,
       220*x/12,
       195.998*x/12,
-      174.614*y/10]
+      174.614*y/10];
+      bassSeqLength = bassNoteList.length;
+
+      pianoNoteList = [
+        [349.228, 391.995, 440],
+        [261.626*x/12, 293.665*x/12, 329.628*y/10],
+        [349.228*y/10, 391.995*x/12, 440*y/10],
+        [349.228*y/10, 391.995*x/12, 440*y/10],
+        [261.626*x/12, 293.665*x/12, 329.628*y/10],
+        [349.228*y/10, 391.995*x/12, 440*y/10]
+      ];
+      pianoSeqLength = pianoNoteList.length;
+
+      kickNoteList = [
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41,
+      65.41];
+      kickSeqLength = kickNoteList.length;
     }
 
     makeNoteList();
 
-    bassNoteStepper = function () {
+    pianoNoteStepper = function () {
       if (playingVar == true) {
-        bassNoteIndex = (bassNoteIndex + 1) % seqLength;
-          setTimeout(playBNote, bassTimeList[bassNoteIndex]);
+        pianoNoteIndex = (pianoNoteIndex + 1);
+        if (pianoNoteIndex < pianoSeqLength)
+          setTimeout(playPNote, pianoTimeList[pianoNoteIndex]);
+        else {
+          readyToStart = readyToStart - 1;
+          console.log("paino ending ready to start " + readyToStart);
+          startPlay();
+        }
       }
     }
 
-    startPlay = function () {
-      bassNoteStepper();
+    bassNoteStepper = function () {
+      if (playingVar == true ) {
+        bassNoteIndex = bassNoteIndex + 1;
+        if (bassNoteIndex < bassSeqLength){
+          setTimeout(playBNote, bassTimeList[bassNoteIndex]);
+        }
+        else {
+          console.log("bass ending ready to start " + readyToStart);
+          readyToStart = readyToStart - 1;
+          startPlay();
+        }
+      }
+    }
+
+    kickNoteStepper = function () {
+      if (playingVar == true) {
+        kickNoteIndex = (kickNoteIndex + 1);
+        if (kickNoteIndex < kickSeqLength){
+          setTimeout(playKNote, kickTimeList[kickNoteIndex]);
+        }
+        else {
+          console.log("kick ending ready to start " + readyToStart);
+          readyToStart = readyToStart - 1;
+          startPlay();  
+        }
+      }
     }
 
     playPNote = function () {
-      piano.triggerAttackRelease(chordList[noteIndex](x, y), "2n");
+      piano.triggerAttackRelease(pianoNoteList[pianoNoteIndex], "4n");
       pianoNoteStepper();
     }
 
     playBNote = function () {
-      bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "32n");
+      bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "8n");
       bassNoteStepper();
     }
 
+    playKNote = function () {
+      kick.triggerAttackRelease(kickNoteList[kickNoteIndex], "32n");
+      kickNoteStepper();
+    }
+
+    startPlay = function () {
+      console.log(readyToStart + " over here");
+      if (readyToStart == 0){
+        console.log("calling functions again");
+        readyToStart = instrumentCount;
+        bassNoteIndex = -1;
+        kickNoteIndex = -1;
+        pianoNoteIndex = -1;
+        bassNoteStepper();
+        pianoNoteStepper();
+        kickNoteStepper()
+      }
+    }
+
     playC = function () {
+      // Tone.Transport.start("+0.1");
+      // Tone.Transport.start();
+      // loop.start();
       playingVar = true;
+      readyToStart = 0;
       startPlay();
     }
     playD = function () {
+      // Tone.Transport.stop();
+      // loop.stop();
       playingVar = false;
+      // readyToStart = 0;
     }
 
 

@@ -45,91 +45,6 @@
 		var p = 0
 		var q = 0
 
-		// var Chord1 = [349.228, 391.995, 440];
-		Chord1 = function (x, y) {
-			return [349.228, 391.995, 440];
-		}
-		// var Chord2 = [261.626*x/12, 293.665*x/12, 329.628*y/10];
-		Chord2 = function (x, y) {
-			return [261.626*x/12, 293.665*x/12, 329.628*y/10];
-		}
-		// var Chord3 = [349.228*y/10, 391.995*x/12, 440*y/10];
-		Chord3 = function (x, y) {
-			return [349.228*y/10, 391.995*x/12, 440*y/10];
-		}
-		// var pianoPart = new Tone.Part(function(time, chord){
-		// 	piano.triggerAttackRelease(chord, "4n", time);
-		// }, [[0, Chord1], 
-		// 	[6+q, Chord2], 
-		// 	[9+q, Chord3], 
-		// 	[12+p, Chord3], 
-		// 	[18+q, Chord2], 
-		// 	[21+p, Chord3]]).start(0);
-		// pianoPart.loop = true;
-		// pianoPart.loopEnd = 24;
-
-		//the notes
-		// var noteNames = ["F#", "E", "C#", "A"];
-
-		var chordList = [Chord1, Chord2, Chord3, Chord3, Chord2, Chord3];
-
-		var loop = new Tone.Sequence(function(time, col){
-			// var column = matrix1.matrix[col];
-			for (var i = 0; i < 6; i++){
-				console.log( i + " " + time);
-				piano.triggerAttackRelease(chordList[i](x, y), "2n", time)
-			}
-		}, [0, 6+q, 9+q, 12+p, 18+q, 21+p], "6n");
-
-		Tone.Transport.start();
-
-
-		addX = function () {
-			x = (x + 1) % 4;
-			console.log(x);
-			makeNoteList();
-		}
-		addY = function () {
-			y = (y + 1) % 40;
-			makeNoteList();
-
-		}
-		addP = function () {
-			// p = (p + 0.1) % 2;
-			p += 50;
-					// Tone.Transport.start();
-			makeTimeList();
-
-		}
-		addQ = function () {
-			// q = (q + 0.1) % 2;
-			q += 50;
-			makeTimeList();
-		}
-
-		subX = function () {
-			x = (x - 1) % 4;
-			console.log(x);
-			makeNoteList();
-		}
-		subY = function () {
-			y = (y - 1) % 40;
-			makeNoteList();
-
-		}
-		subP = function () {
-			// p = (p + 0.1) % 2;
-			p -= 200;
-					// Tone.Transport.start();
-			makeTimeList();
-
-		}
-		subQ = function () {
-			// q = (q + 0.1) % 2;
-			q -= 200;
-			makeTimeList();
-		}
-
 		playingVar = false;
 		// seqLength = 27;
 		noteIndex = -1;
@@ -362,6 +277,54 @@
 			playingVar = false;
 			// readyToStart = 0;
 		}
+
+		
+		addX = function () {
+			x = (x + 1) % 4;
+			console.log(x);
+			makeNoteList();
+		}
+		addY = function () {
+			y = (y + 1) % 40;
+			makeNoteList();
+
+		}
+		addP = function () {
+			// p = (p + 0.1) % 2;
+			p += 50;
+					// Tone.Transport.start();
+			makeTimeList();
+
+		}
+		addQ = function () {
+			// q = (q + 0.1) % 2;
+			q += 50;
+			makeTimeList();
+		}
+
+		subX = function () {
+			x = (x - 1) % 4;
+			console.log(x);
+			makeNoteList();
+		}
+		subY = function () {
+			y = (y - 1) % 40;
+			makeNoteList();
+
+		}
+		subP = function () {
+			// p = (p + 0.1) % 2;
+			p -= 200;
+					// Tone.Transport.start();
+			makeTimeList();
+
+		}
+		subQ = function () {
+			// q = (q + 0.1) % 2;
+			q -= 200;
+			makeTimeList();
+		}
+
 
 		
 		
