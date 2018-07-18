@@ -48,6 +48,7 @@
   <!-- <script type="text/javascript" src="/bower_components/bootstrap-slider/bootstrap-slider.js"></script> -->
 
   <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
+  <script src="js/two.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="https://tonejs.github.io/build/Tone.js"></script>
   <!-- <script src="/public/"></script> -->
@@ -603,6 +604,9 @@
     <span class="dot" id="d6"></span>
   </div>
 
+  <div class="row" id="draw-shapes">
+  </div>
+
   <script>
       $(function() {
         $(".dial").knob({
@@ -662,6 +666,27 @@
       //   console.log($(this).val(), (this).$[0].id);
       //   socket.emit("clientVarChange", [v[0], (this).$[0].id]);
       // })
+
+  var elem = document.getElementById('draw-shapes');
+  var params = { width: 285, height: 200 };
+  var two = new Two(params).appendTo(elem);
+
+  // two has convenience methods to create shapes.
+  var circle = two.makeCircle(72, 100, 50);
+  var rect = two.makeRectangle(213, 100, 100, 100);
+
+  // The object returned has many stylable properties:
+  circle.fill = '#FF8000';
+  circle.stroke = 'orangered'; // Accepts all valid css color
+  circle.linewidth = 5;
+
+  rect.fill = 'rgb(0, 200, 255)';
+  rect.opacity = 0.75;
+  rect.noStroke();
+
+  // Don't forget to tell two to render everything
+  // to the screen
+  two.update();
 
   </script>
 
