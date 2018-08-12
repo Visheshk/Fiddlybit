@@ -27,8 +27,14 @@ app.get('/', function(req, res){
 
 });
 
+
 app.get('/manual', function(req, res){
   res.sendFile(__dirname + '/manualNoteSeq.html');
+
+});
+
+app.get('/:pno', function(req, res){
+  res.sendFile(__dirname + "/p-" + req.params.pno + ".html");
 
 });
 

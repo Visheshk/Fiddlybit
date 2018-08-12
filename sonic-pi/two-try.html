@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Puzzle 0 - Fiddlybits</title>
+  </head>
+<body>
+  <div class="row" id="draw-shapes">
+  </div>
+
+  <script src="public/js/two.min.js"></script>
+  <script>
+  var elem = document.getElementById('draw-shapes');
+  var params = { width: 800, height: 200 };
+  var two = new Two(params).appendTo(elem);
+
+  // two has convenience methods to create shapes.
+  // var circle = two.makeCircle(72, 100, 50);
+  // var rect = two.makeRectangle(213, 100, 100, 100);
+
+  // // The object returned has many stylable properties:
+  // circle.fill = '#FF8000';
+  // circle.stroke = 'orangered'; // Accepts all valid css color
+  // circle.linewidth = 5;
+
+  // rect.fill = 'rgb(0, 200, 255)';
+  // rect.opacity = 0.75;
+  // rect.noStroke();
+  var rectsArray = [];
+  var rectRotates = [];
+  var currentRotates = [];
+  for (var i = 0; i < 13; i++) {
+    var rectangle = two.makeRoundedRectangle(40*(i+1), 100, 30, 10,5);
+    rectangle.fill = "#FF8000";
+    rectangle.stroke = "#FF8060"; 
+    rectsArray.push(rectangle);
+    currentRotates.push(0);
+    rectRotates.push(0);
+  }
+
+  
+
+  // Don't forget to tell two to render everything
+  // to the screen
+  two.update();
+
+  changeRotate = function (rotations) {
+    
+  }
+
+  two.bind('update', function(frameCount) {
+    for (var i = 0; i < 13; i++) {
+      if (currentRotates[i] != rectRotates[i]) {
+        if (rectRotates[i] - currentRotates[i] > 0.04){
+          currentRotates[i] += (rectRotates[i] - currentRotates[i])/10;
+        }
+        else {
+          currentRotates[i] = rectRotates[i];
+        }
+      }
+      rectsArray[i].rotation = currentRotates[i];  
+    }
+  }).play();
+
+  </script>
+</body>
+</html>

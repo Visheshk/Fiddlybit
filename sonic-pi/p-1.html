@@ -28,16 +28,9 @@
     </style>
   </head>
   <body>
-  <!--   <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
- -->
-  
   <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
   <link href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
   <link href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
-  <!-- <link href="/bower_components/bootstrap-slider/slider.css" rel="stylesheet"> -->
   
   <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script type="text/javascript" src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
@@ -45,29 +38,11 @@
   <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
   <script type="text/javascript" src="/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
   <script type="text/javascript" src="/bower_components/jQuery-Kontrol/js/jquery.kontrol.js"></script>
-  <!-- <script type="text/javascript" src="/bower_components/bootstrap-slider/bootstrap-slider.js"></script> -->
 
-  <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
   <script src="js/two.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="https://tonejs.github.io/build/Tone.js"></script>
-  <!-- <script src="/public/"></script> -->
-
-  <!-- <script type="text/javascript" src="Tone.js"></script> -->
-
-  <!-- <script src="./node_modules/dist/osc.min.js"></script> -->
-  <!-- <script src="dist/osc.js"></script> -->
-  <!-- <script src="bower_components/osc.js/dist/osc-browser.min.js"></script> -->
-  <!-- <script src="bower_components/osc-js/dist/osc.min.js"></script> -->
-  <!-- <script src="/socket.io/socket.io.js"></script> -->
-  
-<!--   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
- -->  <!-- <script src='./gibber.audio.lib.min.js'></script> -->
-
   <script>
-    // Gibber.init();
-
-
     var bass = new Tone.MonoSynth({
       "volume" : -10,
       "envelope" : {
@@ -106,6 +81,7 @@
     var y = 10
     var p = 0
     var q = 0
+    var x1 = 0;
 
     playingVar = false;
     // seqLength = 27;
@@ -195,15 +171,15 @@
 
     makeNoteList = function () {
       bassNoteList = [
-      220, 
+      220 + x1, 
       195.998, 
-      175.614, 
+      175.614 + x1, 
       195.998, 
-      220*x/12, 
+      220*x/12 + x1, 
       220*y/10,
-      220,
+      220 + x1,
       195.998*x/12,
-      195.998*y/10,
+      195.998*y/10 + x1,
       195.998,
       220*x/12,
       261.626*x/12,
@@ -301,16 +277,22 @@
 
     playPNote = function () {
       piano.triggerAttackRelease(pianoNoteList[pianoNoteIndex], "4n");
+
       pianoNoteStepper();
     }
 
     playBNote = function () {
       bass.triggerAttackRelease(bassNoteList[bassNoteIndex], "8n");
+      if (bassNoteIndex < 13){
+        // console.log("piano note index");
+        rectRotates[bassNoteIndex] = rectRotates[bassNoteIndex] - (noteOffsets[bassNoteIndex] * Math.PI/24);
+      }
       bassNoteStepper();
     }
 
     playKNote = function () {
       kick.triggerAttackRelease(kickNoteList[kickNoteIndex], "32n");
+
       kickNoteStepper();
     }
 
@@ -322,6 +304,7 @@
         bassNoteIndex = -1;
         kickNoteIndex = -1;
         pianoNoteIndex = -1;
+        resetRotates();
         bassNoteStepper();
         pianoNoteStepper();
         kickNoteStepper()
@@ -341,6 +324,12 @@
       // loop.stop();
       playingVar = false;
       // readyToStart = 0;
+    }
+
+    function resetRotates() {
+      noteOffsets.forEach(function (item, index) {
+        rectRotates[index] = rectRotates[index] + (item * Math.PI/24);
+      });
     }
 
 
@@ -406,15 +395,33 @@
         }
       }); */
 
+      x1notes = [0,2,4,6,8];
+      noteOffsets = [5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 0, 0, 0];
+      rectRotator = function (rectNo, rot) {
+        rectRotates[rectNo] = rot;
+      } 
+
       socket.on("variable values", function (servervals) {
         // console.log(servervals)
         vals = servervals;
-        x = vals["x"];
-        y = vals["y"];
-        p = vals["p"];
-        q = vals["q"];
+        x1 = vals["x"] - 5;
+        
+        x1Rot = (x1 * Math.PI/24);
+        x1notes.forEach(function (no) {rectRotator(no, x1Rot)});
+        x1 = Math.round(x1 * 10) / 10;
+        console.log(x1);
+        // rectRotates[0] = x1Rot;
+        // rectRotates[2] = x1Rot;
+        // rectRotates[4] = x1Rot;
+        // rectRotates[6] = x1Rot;
+        // rectRotates[8] = x1Rot;
+        y1 = vals["y"];
+        p1 = vals["p"];
+        q1 = vals["q"];
         makeNoteList();
         makeTimeList();
+
+        
         
         for (v in vals) {
           // document.getElementById("" + vals[v].docid).innnerHTML= "" + vals[v].val;
@@ -560,7 +567,7 @@
     </div>
 
     <div class="btn-group-vertical" role="group" aria-label="speed-direction" style="padding:35px;float:left;">
-      <input type="text" value="75" class="dial" id="dial2">
+      <input type="text" data-min = "40" data-max="110" value="75" class="dial" id="dial2">
     </div>
 
   </div>
@@ -598,14 +605,14 @@
 
   </div>
   
-  <div class="row">
+  <!-- <div class="row">
     <span class="dot" id="d1"></span>
     <span class="dot" id="d2"></span>
     <span class="dot" id="d3"></span>
     <span class="dot" id="d4"></span>
     <span class="dot" id="d5"></span>
     <span class="dot" id="d6"></span>
-  </div>
+  </div> -->
 
   <div class="row" id="draw-shapes">
   </div>
@@ -687,11 +694,15 @@
   // rect.opacity = 0.75;
   // rect.noStroke();
   var rectsArray = [];
+  var rectRotates = [];
+  var currentRotates = [];
   for (var i = 0; i < 13; i++) {
     var rectangle = two.makeRoundedRectangle(40*(i+1), 100, 30, 10,5);
     rectangle.fill = "#FF8000";
     rectangle.stroke = "#FF8060"; 
     rectsArray.push(rectangle);
+    currentRotates.push(0);
+    rectRotates.push(0);
   }
 
   
@@ -699,6 +710,23 @@
   // Don't forget to tell two to render everything
   // to the screen
   two.update();
+  changeRotate = function (rotations) {
+
+  }
+
+  two.bind('update', function(frameCount) {
+    for (var i = 0; i < 13; i++) {
+      if (currentRotates[i] != rectRotates[i]) {
+        if (Math.abs(rectRotates[i] - currentRotates[i]) > 0.04){
+          currentRotates[i] += (rectRotates[i] - currentRotates[i])/10;
+        }
+        else {
+          currentRotates[i] = rectRotates[i];
+        }
+      }
+      rectsArray[i].rotation = currentRotates[i];  
+    }    
+  }).play();
 
   </script>
 
